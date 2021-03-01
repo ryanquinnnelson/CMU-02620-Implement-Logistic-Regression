@@ -3,7 +3,7 @@ import numpy as np
 
 
 def test__set_weights():
-    expected = np.array([0,0,0])
+    expected = np.array([0, 0, 0])
     actual = lr._set_weights(3)
     np.testing.assert_array_equal(actual, expected)
 
@@ -23,8 +23,7 @@ def test__add_x0_two_cols():
 
 
 def test__init__():
-    a = lr.LogisticRegression(eta=0.01,epsilon=0.5)
+    a = lr.LogisticRegression(eta=0.01, epsilon=0.5)
     assert a.eta == 0.01
     assert a.epsilon == 0.5
     assert a.weights is None
-

@@ -2,6 +2,7 @@ import numpy as np
 import packages.LogisticRegression.gradient_descent as gd
 
 
+# tested
 def _set_weights(cols):
     """
     Creates an array of weights of length equal to cols, with each element set to 0.
@@ -11,6 +12,7 @@ def _set_weights(cols):
     return np.zeros(cols)
 
 
+# tested
 def _add_x0(X):
     """
     Adds a column to the left of matrix X with each element set to 1.

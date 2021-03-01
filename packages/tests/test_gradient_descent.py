@@ -9,28 +9,8 @@ def test__calc_inner():
     w = np.array([2, 4, 5, 6])
 
     expected = np.array([33, 17, 34])
-    actual = gd._calc_inner(X,w)
+    actual = gd._calc_inner(X, w)
     np.testing.assert_array_equal(actual, expected)
-
-
-def test__calc_log_likelihood():
-    X = np.array([[.1, .5, .1, .1],
-                  [.1, .1, .1, .1],
-                  [.1, .1, .2, .3]])
-    w = np.array([2, 4, 5, 6])
-    y_true = np.array([1, 0, 0])
-
-    # generate expected values
-    num_rows = X.shape[0]
-    ones = np.ones(num_rows)
-    expect_YXW = np.array([4.3, 1.7, 3.4])
-    XW_test = np.matmul(X, w)
-    expect_inner = ones + np.exp(XW_test)
-    expected = expect_YXW - np.log(expect_inner)
-
-    # compare
-    actual = gd._calc_log_likelihood(X, y_true, w)
-    np.testing.assert_allclose(actual, expected)  # rounding makes exact match impossible
 
 
 def test__get_y_predictions():
@@ -64,6 +44,37 @@ def test__update_weights():
     actual = gd._update_weights(w, eta, gradient)
     np.testing.assert_array_equal(actual, expected)
 
+
+def test__calc_left_half_log_likelihood():
+    X = np.array([[1, 1, 1, 1],
+                  [1, 5, 1, 1],
+                  [1, 1, 2, 3]])
+    w = np.array([2, 4, 5, 6])
+    y_true = np.array([1, 0, 0])
+    expected = 17
+    actual = gd._calc_left_half_log_likelihood(X, y_true, w)
+    assert actual == expected
+
+
+def test__calc_right_half_log_likelihood():
+    X = np.array([[1, 1, 1, 1],
+                  [1, 5, 1, 1],
+                  [1, 1, 2, 3]])
+    w = np.array([2, 4, 5, 6])
+    expected = 84.00000004139937
+    actual = gd._calc_right_half_log_likelihood(X, w)
+    assert actual == expected
+
+
+def test__calc_log_likelihood():
+    X = np.array([[1, 1, 1, 1],
+                  [1, 5, 1, 1],
+                  [1, 1, 2, 3]])
+    w = np.array([2, 4, 5, 6])
+    y_true = np.array([1, 0, 0])
+    expected = 17 - 84.00000004139937
+    actual = gd._calc_log_likelihood(X, y_true, w)
+    assert actual == expected
 
 # def test__get_y_prediction():
 #     x = np.array([1, 1, 2])

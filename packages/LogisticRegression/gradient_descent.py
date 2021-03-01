@@ -169,7 +169,7 @@ gradient = (X_aug)^T(y_err) =   | d w2 | =  | (x12*y1) + (x22*y2) + (x32*y3) |
 """
 
 """
-Note 3 - Explanation of how _calc_log_likelihood() works
+Note 3 - Explanation of log likelihood calculation
 
 According to Mitchell, log likelihood l(W) can be calculated as follows:
 
@@ -181,7 +181,9 @@ where
 - i is the ith feature
 - n is the number of features
 
-The math required to calculate A is the same as Note 2. 
+The math required to calculate A is found in Note 1. We can distribute the summation to get:
+
+l(W) = SUM_L [ Y^L * A ] - SUM_L [ ln( 1 + exp(A)) ]
 """
 
 
@@ -207,7 +209,7 @@ def _calc_inner(X, w):
 
     :param X:  L x n matrix, where L is the number of samples and n is the number of features
     :param w: n x 1 vector
-    :return:
+    :return: L x 1 vector
     """
     return np.matmul(X, w)
 
@@ -250,6 +252,40 @@ def _calc_gradient(X, y_true, y_pred):
     return np.matmul(X.T, y_err)
 
 
+# tested
+def _calc_left_half_log_likelihood(X, y_true, w):
+    """
+    Calculates the YA sum used in log likelihood, where A = w_0 + SUM_i^n w_i X_i^L.
+    See Note 3 for details.
+
+    :param X: L x n matrix, where L is the number of samples and n is the number of features
+    :param y_true: L x 1 vector
+    :param w: n x 1 vector
+    :return: scalar
+    """
+    Xw = _calc_inner(X, w)
+    return np.dot(y_true, Xw)
+
+
+# tested
+def _calc_right_half_log_likelihood(X, w):
+    """
+    Calculates the ln(1 + exp(A)) sum used in log likelihood, where A = w_0 + SUM_i^n w_i X_i^L.
+    See Note 3 for details.
+
+    :param X: L x n matrix, where L is the number of samples and n is the number of features
+    :param w: n x 1 vector
+    :return: scalar
+    """
+    Xw = _calc_inner(X, w)
+    num_rows = X.shape[0]
+    ones = np.ones(num_rows)  # for each sample
+    inner = ones + np.exp(Xw)
+    ln_Xw = np.log(inner)
+    return np.sum(ln_Xw)  # sum over L samples
+
+
+# tested
 def _calc_log_likelihood(X, y_true, w):
     """
     Calculates log likelihood. See Note 3 for explanation of function logic.
@@ -257,22 +293,15 @@ def _calc_log_likelihood(X, y_true, w):
     :param X: L x n matrix, where L is the number of samples and n is the number of features
     :param y_true: L x 1 vector
     :param w: n x 1 vector
-    :return:
+    :return: scalar
     """
-    # left half
-    Xw = _calc_inner(X,w)
-    yXw = y_true + Xw  # all L samples can be summed in parallel
+    # left half of expression
+    sum_1 = _calc_left_half_log_likelihood(X, y_true, w)
 
-    # right half
-    num_rows = X.shape[0]
-    ones = np.ones(num_rows)
-    inner = ones + np.exp(Xw)
-    ln_Xw = np.log(inner)
+    # right half of expression
+    sum_2 = _calc_right_half_log_likelihood(X, w)
 
-    return yXw - ln_Xw
-
-
-
+    return sum_1 - sum_2
 
 
 # ?? diff is a vector, how to compare with epsilon?
@@ -316,7 +345,6 @@ def gradient_descent(X, y_true, w, eta, epsilon):
 
     print('count of rounds', count)
     return weights
-
 
 # def _get_y_prediction(x, w):
 #     """

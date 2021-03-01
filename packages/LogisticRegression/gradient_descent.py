@@ -57,13 +57,20 @@ W = (X_transpose)(y_err)
 
 
 def _calc_log_likelihood(X, y_true, W):
+    """
+
+    :param X:
+    :param y_true:
+    :param W:
+    :return:
+    """
     # left half
     XW = np.matmul(X, W)
     YXW = y_true + XW  # all L samples can be summed in parallel
 
     # right half
     num_rows = X.shape[0]
-    ones = np.ones(num_rows)  # create a vector of 1's
+    ones = np.ones(num_rows)
     inner = ones + np.exp(XW)
     ln_XW = np.log(inner)
 
@@ -71,10 +78,13 @@ def _calc_log_likelihood(X, y_true, W):
 
 
 def _get_y_prediction(X, W):
-    '''
-    Gets y predictions for one X_i.
-    Assumes "imaginary" X_0 = 1 for all samples has been added to the matrix.
-    '''
+    """
+    Obtains predicted label for one sample.
+
+    :param X:
+    :param W:
+    :return:
+    """
 
     a = np.dot(X, W)
     b = np.exp(a)
@@ -84,14 +94,17 @@ def _get_y_prediction(X, W):
 
 
 def _get_y_predictions(X, W):
-    '''
-    Gets y predictions for all samples.
-    Assumes "imaginary" X_0 = 1 for all samples has been added to the matrix.
-    '''
+    """
+    Gets predicted labels for all samples.
+
+    :param X:
+    :param W:
+    :return:
+    """
     num_rows = X.shape[0]
-    XW = np.matmul(X, W)  # all L samples can be summed in parallel
+    XW = np.matmul(X, W)  # all samples can be summed in parallel
     top = np.exp(XW)
-    ones = np.ones(num_rows)  # create a vector of 1's
+    ones = np.ones(num_rows)
     bottom = ones + top
     return top / bottom
 
@@ -100,10 +113,10 @@ def _calc_gradient(X, y_true, y_pred):
     """
     Calculates the gradient.
     Assumes "imaginary" X_0 = 1 for all samples has been added to the matrix.
-    See Note 1 on gradient calculation.
+    See Note 1 for in-depth explanation of function logic.
 
-    :param X:  L x n matrix, where L is the number of samples and n is the number of features
-    :param y_true:  L x 1 vector
+    :param X: L x n matrix, where L is the number of samples and n is the number of features
+    :param y_true: L x 1 vector
     :param y_pred: L x 1 vector
     :return: Gradient in the form of an L x 1 vector
     """
@@ -113,6 +126,7 @@ def _calc_gradient(X, y_true, y_pred):
 
 def _update_weights(W, eta, gradient):
     """
+    Updates regression coefficients (weights) using the following formula:
     W <- W + (eta * gradient)
 
     :param W:
@@ -127,7 +141,7 @@ def _update_weights(W, eta, gradient):
 # ?? diff is a vector, how to compare with epsilon?
 def gradient_descent(X, y_true, eta, epsilon, W):
     """
-    Performs gradient descent to derive regression coefficients.
+    Performs gradient descent to derive optimal regression coefficients.
 
     :param X:
     :param y_true:

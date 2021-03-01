@@ -5,5 +5,5 @@ Spring 2021 Machine Learning for Scientists summary - algorithm implementations
 
 - Regression
     - Univariate Regression (mean-centered)
-    - Ridge Regression
+    - Ridge Regression (mean-centered)
 - Classification

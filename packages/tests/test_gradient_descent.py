@@ -6,43 +6,42 @@ def test__calc_log_likelihood():
     X = np.array([[.1, .5, .1, .1],
                   [.1, .1, .1, .1],
                   [.1, .1, .2, .3]])
-    W = np.array([2, 4, 5, 6])
+    w = np.array([2, 4, 5, 6])
     y_true = np.array([1, 0, 0])
 
     # generate expected values
     num_rows = X.shape[0]
     ones = np.ones(num_rows)
     expect_YXW = np.array([4.3, 1.7, 3.4])
-    XW_test = np.matmul(X, W)
+    XW_test = np.matmul(X, w)
     expect_inner = ones + np.exp(XW_test)
     expected = expect_YXW - np.log(expect_inner)
 
     # compare
-    actual = gd._calc_log_likelihood(X, y_true, W)
+    actual = gd._calc_log_likelihood(X, y_true, w)
     np.testing.assert_allclose(actual, expected)  # rounding makes exact match impossible
 
 
 def test__get_y_prediction():
-    X = np.array([1, 1, 2])
-    W = np.array([4, 5, 6])
-    expected = 1318815734 / 1318815735
-    actual = gd._get_y_prediction(X, W)
+    x = np.array([1, 1, 2])
+    w = np.array([4, 5, 6])
+    expected = np.exp(21) / (1 + np.exp(21))
+    actual = gd._get_y_prediction(x, w)
     assert actual == expected
 
 
 def test__get_y_predictions():
-    print('test get_y_predictions()')
     X = np.array([[.1, .5, .1, .1],
                   [.1, .1, .1, .1],
                   [.1, .1, .2, .3]])
-    W = np.array([2, 4, 5, 6])
+    w = np.array([2, 4, 5, 6])
 
-    a = gd._get_y_prediction(X[0], W)
-    b = gd._get_y_prediction(X[1], W)
-    c = gd._get_y_prediction(X[2], W)
+    a = gd._get_y_prediction(X[0], w)  # row 1
+    b = gd._get_y_prediction(X[1], w)  # row 2
+    c = gd._get_y_prediction(X[2], w)  # row 3
 
     expected = np.array([a, b, c])
-    actual = gd._get_y_predictions(X, W)
+    actual = gd._get_y_predictions(X, w)
     np.testing.assert_array_equal(actual, expected)
 
 
@@ -60,7 +59,8 @@ def test__calc_gradient():
 def test__update_weights():
     eta = 0.01
     gradient = np.array([1, -2, 3])
-    W = np.array([4, 5, 6])
+    w = np.array([4, 5, 6])
+
     expected = np.array([4.01, 4.98, 6.03])
-    actual = gd._update_weights(W, eta, gradient)
+    actual = gd._update_weights(w, eta, gradient)
     np.testing.assert_array_equal(actual, expected)

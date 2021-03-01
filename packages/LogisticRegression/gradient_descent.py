@@ -1,5 +1,4 @@
 import numpy as np
-import packages.LogisticRegression as lr
 
 """
 Note 1 - Explanation of how _calc_gradient() works.
@@ -55,9 +54,6 @@ W = (X_transpose)(y_err)
 | w2 | =  | (x12*y1) + (x22*y2) + (x32*y3) |
 | w3 |    | (x13*y1) + (x23*y2) + (x33*y3) |
 """
-
-
-
 
 
 def _calc_log_likelihood(X, y_true, W):

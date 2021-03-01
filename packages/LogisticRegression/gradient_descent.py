@@ -304,17 +304,16 @@ def _calc_log_likelihood(X, y_true, w):
     return sum_1 - sum_2
 
 
-# ?? diff is a vector, how to compare with epsilon?
 def gradient_descent(X, y_true, w, eta, epsilon):
     """
     Performs gradient descent to derive optimal regression coefficients.
 
-    :param X:
-    :param y_true:
-    :param eta:
-    :param epsilon:
-    :param w:
-    :return:
+    :param X: L x n matrix, where L is the number of samples and n is the number of features
+    :param y_true: L x 1 vector
+    :param w: n x 1 vector
+    :param eta: learning rate
+    :param epsilon: convergence threshold
+    :return: n x 1 vector
     """
     # set initial weights
     weights = w
@@ -329,7 +328,7 @@ def gradient_descent(X, y_true, w, eta, epsilon):
 
         count += 1
         if count > 100000:
-            break  # stop descending
+            break  # stop descending because something is probably wrong
 
         # update weights
         y_pred = _get_y_predictions(X, weights)
@@ -345,18 +344,3 @@ def gradient_descent(X, y_true, w, eta, epsilon):
 
     print('count of rounds', count)
     return weights
-
-# def _get_y_prediction(x, w):
-#     """
-#     Obtains predicted label for one sample. See Note 2 for explanation of function logic.
-#
-#     :param x: n x 1 vector
-#     :param w: n x 1 vector
-#     :return:  scalar
-#     """
-#
-#     a = np.dot(x, w)
-#     b = np.exp(a)
-#     c = 1 + np.exp(a)
-#
-#     return b / c

@@ -75,10 +75,3 @@ def test__calc_log_likelihood():
     expected = 17 - 84.00000004139937
     actual = gd._calc_log_likelihood(X, y_true, w)
     assert actual == expected
-
-# def test__get_y_prediction():
-#     x = np.array([1, 1, 2])
-#     w = np.array([4, 5, 6])
-#     expected = np.exp(21) / (1 + np.exp(21))
-#     actual = gd._get_y_prediction(x, w)
-#     assert actual == expected

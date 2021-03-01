@@ -2,6 +2,17 @@ import numpy as np
 import packages.LogisticRegression.gradient_descent as gd
 
 
+def test__calc_inner():
+    X = np.array([[1, 5, 1, 1],
+                  [1, 1, 1, 1],
+                  [1, 1, 2, 3]])
+    w = np.array([2, 4, 5, 6])
+
+    expected = np.array([33, 17, 34])
+    actual = gd._calc_inner(X,w)
+    np.testing.assert_array_equal(actual, expected)
+
+
 def test__calc_log_likelihood():
     X = np.array([[.1, .5, .1, .1],
                   [.1, .1, .1, .1],

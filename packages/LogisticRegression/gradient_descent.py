@@ -1,16 +1,89 @@
 """
-Implementation of gradient descent for Logistic Regression, as defined
-by Machine Learning (Mitchell)
-Assumes "imaginary" X_0 = 1 for all samples has been added to the matrix.
+Implementation of gradient descent for Logistic Regression, as defined by Machine Learning (Mitchell).
+Assumes "imaginary" X_0 = 1 for all samples has been added to the matrix to accommodate w_0 (i.e. X has been augmented
+so that its first column is 1's).
 """
 
 import numpy as np
 
 """
+Note 1 - Explanation of _calc_inner()
+
+Many of the formulas for Logistic Regression involve a calculation between n x 1 weights vector w and L x n feature 
+matrix X:
+
+w_0 + SUM_i^n w_i X_i^L
+where
+- i is the ith feature
+- n is the number of features
+- L is the number of samples
+
+This can be accomplished efficiently using matrix multiplication, as explained below. As discussed in Mitchell, we 
+augment X with imaginary X_0 column to accommodate w_0.
+
+CASE 1 - Single feature, single sample
+-----------------------------------------
+X        w                 X_aug        w
+|x11|    | w0 |            | 1 |x12|    | w0 | 
+         | w1 |   ->                    | w1 |      
+                      
+We perform the summation using dot product and get a scalar.
+
+X_aug dot w = 1*w0 + x12*w1
+
+
+CASE 2 - Multiple features, single sample
+-----------------------------------------
+X            w                 X_aug            w
+|x11|x12|    | w0 |            | 1 |x12|x13|    | w0 | 
+             | w1 |   ->                        | w1 | 
+             | w2 |                             | w2 |                             
+
+                      
+We perform the summation using dot product and get a scalar.
+
+X_aug dot w = 1*w0 + x12*w1 + x13*w2
+
+
+CASE 3 - Single feature, multiple samples
+-----------------------------------------
+X        w                 X_aug         w   
+|x11|    | w0 |            | 1 |x12|     | w0 |
+|X21|    | w1 |   ->       | 1 |x22|     | w1 |
+|x31|                      | 1 |x32|
+
+We could perform the summation for each sample separately and place the results into a vector, or we could use matrix 
+multiplication and do all calculations simultaneously. The result is a vector.
+
+               |  1*w0 + x12*w1  |
+(X_aug)(w) =   |  1*w0 + x22*w1  |
+               |  1*w0 + x32*w1  |
+
+
+CASE 4 - Multiple features, multiple samples
+--------------------------------------------
+X                w             X_aug                w
+|x11|x12|x13|    | w0 |        | 1 |x12|x13|x14|    | w0 |
+|X21|x22|x23|    | w1 |   ->   | 1 |x22|x23|x24|    | w1 |
+|x31|x32|x33|    | w2 |        | 1 |x32|x33|x34|    | w2 |
+                 | w3 |                             | w3 | 
+
+This works the same as CASE 3. The result is a vector.
+
+               |  1*w0 + x12*w1 + x13*w2 + x14*w3  |
+(X_aug)(w) =   |  1*w0 + x22*w1 + x23*w2 + x24*w3  |
+               |  1*w0 + x32*w1 + x33*w2 + x34*w3  |
+
+"""
+
+
+
+
+"""
 Note 1 - Explanation of how _calc_gradient() works. According to Mitchell, the ith partial in the gradient can be
 calculated as:
 
-    d l(W)/d w_i = sum_L X_i^L y_err^L
+    d l(W)/d w_i = SUM_L X_i^L y_err^L
     
 where 
 - L is the number of samples
@@ -64,54 +137,82 @@ gradient = (X_transpose)(y_err) =  | d w2 | =  | (x12*y1) + (x22*y2) + (x32*y3) 
 Note 2 - Explanation of how _get_y_predictions() works
 Consider L x n matrix X and n x 1 vector w, where L is the number of samples and n is the number of features.
 
-X                w
-|x11|x12|x13|    | w0 |
-|X21|x22|x23|    | w1 |
-|x31|x32|x33|    | w2 |
 
-For each sample, we need to calculate a prediction. According to Mitchell, we do this by calculating P(Y=1|X,W).
 
-P(Y=1|X,W) = exp(w_0 + SUM_i (w_i X_i) / 1 + exp(w_0 + SUM_i (w_i X_i)
-where i is the ith feature
+For each sample, we need to calculate a predicted label. According to Mitchell, we do this by calculating P(Y=1|x,w).
 
-For a single sample, the sum can be calculated as a dot product. Note that in this implementation, we assume matrix X 
-has been augmented so that it's first column is 1's to accommodate w_0:
+P(Y=1|x,w) = exp(A) / 1 + exp(A)
+where
+- i is the ith feature
+- A = w_0 + SUM_i (w_i X_i)
 
-For l=1: w_0 + SUM_i (w_i X_i) = X dot w = (x11*w1) + (x12*w2) + (x13*w3)
-For l=2: w_0 + SUM_i (w_i X_i) = X dot w = (x21*w1) + (x22*w2) + (x23*w3)
+For a single sample, A can be calculated as a dot product. Note that in this implementation, we assume matrix X 
+has been augmented so that its first column is 1's to accommodate w_0:
 
-However, we can efficiently calculate this sum for all samples at the same time, using matrix multiplication:
+For l=1: w_0 + SUM_i (w_i X_i) = X dot w = (x11*w0) + (x12*w1) + (x13*w2)
+For l=2: w_0 + SUM_i (w_i X_i) = X dot w = (x21*w0) + (x22*w1) + (x23*w2)
 
-     | y_pred_1 |   | (x11*w1) + (x12*w2) + (x13*w3) |
-Xw = | y_pred_2 |   | (x21*w1) + (x22*w2) + (x23*w3) |
-     | y_pred_3 |   | (x31*w1) + (x32*w2) + (x33*w3) |
+However, we can efficiently calculate A for all samples at the same time, using matrix multiplication:
+
+     | y_pred_1 |   | (x11*w0) + (x12*w1) + (x13*w2) |
+Xw = | y_pred_2 | = | (x21*w0) + (x22*w1) + (x23*w2) |
+     | y_pred_3 |   | (x31*w0) + (x32*w1) + (x33*w2) |
 
 Then we can perform exponentiation and addition on the resulting vector.
 """
 
+"""
+Note 3 - Explanation of how _calc_log_likelihood() works
+
+According to Mitchell, log likelihood l(W) can be calculated as follows:
+
+l(W) = SUM_L [ Y^L * A - ln( 1 + exp(A)) ]
+
+where 
+- L is the number of samples
+- A = w_0 + SUM_i^n w_i X_i^L
+- i is the ith feature
+- n is the number of features
+
+The math required to calculate A is the same as Note 2. 
+"""
+
+
+# tested
+def _calc_inner(X, w):
+    """
+    Performs the inner calculation w_0 + SUM_i w_i X_i^L. See Note 1 for explanation of function logic.
+
+    :param X:  L x n matrix, where L is the number of samples and n is the number of features
+    :param w: n x 1 vector
+    :return:
+    """
+    return np.matmul(X, w)
+
 
 def _calc_log_likelihood(X, y_true, w):
     """
+    Calculates log likelihood. See Note 3 for explanation of function logic.
 
-    :param X:
-    :param y_true:
-    :param w:
+    :param X: L x n matrix, where L is the number of samples and n is the number of features
+    :param y_true: L x 1 vector
+    :param w: n x 1 vector
     :return:
     """
     # left half
-    XW = np.matmul(X, w)
-    YXW = y_true + XW  # all L samples can be summed in parallel
+    Xw = np.matmul(X, w)
+    yXw = y_true + Xw  # all L samples can be summed in parallel
 
     # right half
     num_rows = X.shape[0]
     ones = np.ones(num_rows)
-    inner = ones + np.exp(XW)
-    ln_XW = np.log(inner)
+    inner = ones + np.exp(Xw)
+    ln_Xw = np.log(inner)
 
-    return YXW - ln_XW
+    return yXw - ln_Xw
 
 
-# tested
+
 def _get_y_prediction(x, w):
     """
     Obtains predicted label for one sample. See Note 2 for explanation of function logic.
@@ -128,7 +229,7 @@ def _get_y_prediction(x, w):
     return b / c
 
 
-# tested
+
 def _get_y_predictions(X, w):
     """
     Obtains predicted labels for all L samples.  See Note 2 for explanation of function logic.
@@ -146,7 +247,7 @@ def _get_y_predictions(X, w):
     return top / bottom
 
 
-# tested
+
 def _calc_gradient(X, y_true, y_pred):
     """
     Calculates the gradient. See Note 1 for explanation of function logic.
@@ -154,13 +255,13 @@ def _calc_gradient(X, y_true, y_pred):
     :param X: L x n matrix, where L is the number of samples and n is the number of features
     :param y_true: L x 1 vector
     :param y_pred: L x 1 vector
-    :return: Gradient in the form of an L x 1 vector
+    :return: Gradient in the form of an n x 1 vector
     """
     y_err = y_true - y_pred
     return np.matmul(X.T, y_err)
 
 
-# tested
+
 def _update_weights(w, eta, gradient):
     """
     Updates regression coefficients using the following formula:

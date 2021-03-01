@@ -59,6 +59,7 @@ class LogisticRegression:
 
         return self
 
+    # tested
     def predict(self, X):
         """
         Returns predicted label for each sample.

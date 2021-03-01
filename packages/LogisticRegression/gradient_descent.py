@@ -139,7 +139,7 @@ def _update_weights(W, eta, gradient):
 
 
 # ?? diff is a vector, how to compare with epsilon?
-def gradient_descent(X, y_true, eta, epsilon, W):
+def gradient_descent(X, y_true, W, eta, epsilon):
     """
     Performs gradient descent to derive optimal regression coefficients.
 

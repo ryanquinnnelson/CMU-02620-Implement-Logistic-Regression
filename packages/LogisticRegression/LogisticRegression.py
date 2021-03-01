@@ -3,12 +3,13 @@ import packages.LogisticRegression.gradient_descent as gd
 
 
 # tested
-def _set_weights(cols):
+def _set_weights(X):
     """
-    Creates an array of weights of length equal to cols, with each element set to 0.
+    Creates an array of weights with each element set to 0.
     :param cols:
     :return:
     """
+    cols = X.shape[1]
     return np.zeros(cols)
 
 
@@ -27,6 +28,7 @@ def _add_x0(X):
 
 class LogisticRegression:
 
+    # tested
     def __init__(self, eta, epsilon):
         """
 
@@ -48,11 +50,10 @@ class LogisticRegression:
         X_aug = _add_x0(X)
 
         # set initial weights
-        cols = X_aug.shape[1]
-        weights = _set_weights(cols)
+        weights = _set_weights(X_aug)
 
         # perform gradient descent until convergence
-        weights = gd.gradient_descent(X_aug, y, self.eta, self.epsilon, weights)
+        weights = gd.gradient_descent(X_aug, y, weights, self.eta, self.epsilon)
         self.weights = weights
 
         return self

@@ -337,7 +337,7 @@ def gradient_descent(X, y_true, w, eta, epsilon):
 
         # calculate difference
         log_likelihood = _calc_log_likelihood(X, y_true, weights)
-        diff = prev_log_likelihood - log_likelihood
+        diff = np.abs(prev_log_likelihood - log_likelihood)
 
         # save log likelihood for next round
         prev_log_likelihood = log_likelihood

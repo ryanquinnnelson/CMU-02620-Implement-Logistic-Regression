@@ -46,11 +46,11 @@ class LogisticRegression:
         X_aug = _add_x0(X)
 
         # set initial weights
-        cols = X.shape[1]
+        cols = X_aug.shape[1]
         weights = _set_weights(cols)
 
         # perform gradient descent until convergence
-        weights = gd.gradient_descent(X, y, self.eta, self.epsilon, weights)
+        weights = gd.gradient_descent(X_aug, y, self.eta, self.epsilon, weights)
         self.weights = weights
 
         return self

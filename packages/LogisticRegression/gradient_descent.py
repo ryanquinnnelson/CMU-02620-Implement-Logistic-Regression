@@ -7,21 +7,25 @@ Assumes "imaginary" X_0 = 1 for all samples has been added to the matrix.
 import numpy as np
 
 """
-Note 1 - Explanation of how _calc_gradient() works.
+Note 1 - Explanation of how _calc_gradient() works. According to Mitchell, the ith partial in the gradient can be
+calculated as:
 
-    d l(W)/d w_i = sum_l X_i^l ( Y^l - P(Y^l = 1 |X^l,W))
+    d l(W)/d w_i = sum_L X_i^L y_err^L
+    
+where 
+- L is the number of samples
+- i is the ith feature
+- y_err = ( Y^L - P(Y^L = 1 |X^L,W))
+
+This can be accomplished efficiently using matrix multiplication, as explained below.
 
 X                y_err
 |x11|x12|x13|    | y1 |
 |X21|x22|x23|    | y2 |
 |x31|x32|x33|    | y3 |
 
-For each of L samples, the formula has us multiply X_i by y_err:
-
-d l(W) / d w_1 = sum_l ( X_1 * y_err)
-
-
-Calculating the partial for the ith feature is the same as taking the dot product of the ith column of X and y_err.
+We could do this column by column. Calculating the partial for the ith feature is the same as taking the dot product of 
+the ith column of X and y_err:
 
                  X_1         y_err
                  |x11|       | y1 | 
@@ -35,28 +39,25 @@ d l(W) / d w_2 = |x22|  dot  | y2 |  = (x12*y1) + (x22*y2) + (x32*y3)
                  |x32|       | y3 |
 
 
-Instead of calculating partials one by one, we can perform matrix multiplication to do all at the same time. 
-However, we need to transpose X first, because we want to perform column-wise multiplications.
+However, we can perform matrix multiplication to do all these calculations at the same time. We need to transpose X 
+first because we want to perform column-wise multiplications.
 
 X              y_err
 |x11|x12|x13|  | y1 | 
 |x21|x22|x23|  | y2 |
 |x31|x32|x33|  | y3 |
 
-(X)(y_err)
-| (x11*y1) + (x12*y2) + (x13*y3) |
-| (x21*y1) + (x22*y2) + (x23*y3) |
-| (x31*y1) + (x32*y2) + (x33*y3) |
+              | (x11*y1) + (x12*y2) + (x13*y3) |
+(X)(y_err) =  | (x21*y1) + (x22*y2) + (x23*y3) |       (incorrect!)
+              | (x31*y1) + (x32*y2) + (x33*y3) |
 
 X_transpose    y_err
 |x11|x21|x31|  | y1 | 
 |x12|x22|x32|  | y2 |
 |x13|x23|x33|  | y3 |
-
-W = (X_transpose)(y_err)
-| w1 |    | (x11*y1) + (x21*y2) + (x31*y3) |
-| w2 | =  | (x12*y1) + (x22*y2) + (x32*y3) |
-| w3 |    | (x13*y1) + (x23*y2) + (x33*y3) |
+                                   | d w1 |    | (x11*y1) + (x21*y2) + (x31*y3) |
+gradient = (X_transpose)(y_err) =  | d w2 | =  | (x12*y1) + (x22*y2) + (x32*y3) |    (correct!)
+                                   | d w3 |    | (x13*y1) + (x23*y2) + (x33*y3) |
 """
 
 """
@@ -76,14 +77,14 @@ where i is the ith feature
 For a single sample, the sum can be calculated as a dot product. Note that in this implementation, we assume matrix X 
 has been augmented so that it's first column is 1's to accommodate w_0:
 
-For l=1: w_0 + SUM_i (w_i X_i) = X * w = (x11 * w1) + (x12 * w2) + (x13 * w3)
-For l=2: w_0 + SUM_i (w_i X_i) = X * w = (x21 * w1) + (x22 * w2) + (x23 * w3)
+For l=1: w_0 + SUM_i (w_i X_i) = X dot w = (x11*w1) + (x12*w2) + (x13*w3)
+For l=2: w_0 + SUM_i (w_i X_i) = X dot w = (x21*w1) + (x22*w2) + (x23*w3)
 
 However, we can efficiently calculate this sum for all samples at the same time, using matrix multiplication:
 
-     | y_pred_1 |   | (x11 * w1) + (x12 * w2) + (x13 * w3) |
-Xw = | y_pred_2 |   | (x21 * w1) + (x22 * w2) + (x23 * w3) |
-     | y_pred_3 |   | (x31 * w1) + (x32 * w2) + (x33 * w3) |
+     | y_pred_1 |   | (x11*w1) + (x12*w2) + (x13*w3) |
+Xw = | y_pred_2 |   | (x21*w1) + (x22*w2) + (x23*w3) |
+     | y_pred_3 |   | (x31*w1) + (x32*w2) + (x33*w3) |
 
 Then we can perform exponentiation and addition on the resulting vector.
 """
@@ -145,6 +146,7 @@ def _get_y_predictions(X, w):
     return top / bottom
 
 
+# tested
 def _calc_gradient(X, y_true, y_pred):
     """
     Calculates the gradient. See Note 1 for explanation of function logic.

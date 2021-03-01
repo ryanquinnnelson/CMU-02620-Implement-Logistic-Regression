@@ -46,12 +46,12 @@ def test__get_y_predictions():
 
 
 def test__calc_gradient():
-    X = np.array([[1, 5, 1, 1],
-                  [1, 1, 1, 1],
-                  [1, 1, 2, 3]])  # includes imaginary X_0=1 column
+    X = np.array([[1, 1, 1, 1],
+                  [1, 5, 1, 1],
+                  [1, 1, 2, 3]])
     y_true = np.array([1, 0, 1])
     y_pred = np.array([1, 1, 0])
-    expected = np.array([0, 0, 1, 2])
+    expected = np.array([0, -4, 1, 2])
     actual = gd._calc_gradient(X, y_true, y_pred)
     np.testing.assert_array_equal(actual, expected)
 

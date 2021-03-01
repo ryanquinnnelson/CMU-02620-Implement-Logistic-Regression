@@ -2,12 +2,6 @@ import numpy as np
 import packages.LogisticRegression.gradient_descent as gd
 
 
-
-
-
-
-
-
 def test__calc_log_likelihood():
     X = np.array([[.1, .5, .1, .1],
                   [.1, .1, .1, .1],

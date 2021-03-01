@@ -215,7 +215,7 @@ def _calc_inner(X, w):
 
 
 # tested
-def _get_y_predictions(X, w):
+def get_y_predictions(X, w):
     """
     Obtains predicted labels for all L samples, using the following formula:
 
@@ -331,7 +331,7 @@ def gradient_descent(X, y_true, w, eta, epsilon):
             break  # stop descending because something is probably wrong
 
         # update weights
-        y_pred = _get_y_predictions(X, weights)
+        y_pred = get_y_predictions(X, weights)
         gradient = _calc_gradient(X, y_true, y_pred)
         weights = _update_weights(weights, eta, gradient)
 

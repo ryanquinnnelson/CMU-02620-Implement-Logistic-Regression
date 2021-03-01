@@ -20,7 +20,7 @@ def test__get_y_predictions():
     w = np.array([2, 4, 5, 6])
 
     expected = np.exp(np.matmul(X, w)) / (np.ones(3) + np.exp(np.matmul(X, w)))
-    actual = gd._get_y_predictions(X, w)
+    actual = gd.get_y_predictions(X, w)
     np.testing.assert_array_equal(actual, expected)
 
 

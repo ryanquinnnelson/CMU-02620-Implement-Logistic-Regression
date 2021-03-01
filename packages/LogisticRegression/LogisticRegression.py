@@ -14,6 +14,7 @@ def _set_weights(X):
 
 
 # tested
+# does not work properly with a single sample
 def _add_x0(X):
     """
     Adds a column to the left of matrix X with each element set to 1.
@@ -42,8 +43,8 @@ class LogisticRegression:
     def fit(self, X, y):
         """
 
-        :param X:
-        :param y:
+        :param X: L x n matrix, where L is the number of samples and n is the number of features
+        :param y: L x 1 matrix
         :return:
         """
         # append imaginary column X_0=1 to accommodate w_0
@@ -57,3 +58,27 @@ class LogisticRegression:
         self.weights = weights
 
         return self
+
+    def predict(self, X):
+        """
+        Returns predicted label for each sample.
+        :param X: L x n matrix, where L is the number of samples and n is the number of features
+        :return: L x 1 vector
+        """
+        # append imaginary column X_0=1 to accommodate w_0
+        X_aug = _add_x0(X)
+
+        y_pred = gd.get_y_predictions(X_aug, self.weights)
+        return np.round(y_pred)
+
+    def predict_proba(self, X):
+        """
+        Returns calculated probabilities Y=1 for each sample.
+        :param X: L x n matrix, where L is the number of samples and n is the number of features
+        :return: L x 1 vector
+        """
+        # append imaginary column X_0=1 to accommodate w_0
+        X_aug = _add_x0(X)
+
+        y_pred = gd.get_y_predictions(X_aug, self.weights)
+        return y_pred

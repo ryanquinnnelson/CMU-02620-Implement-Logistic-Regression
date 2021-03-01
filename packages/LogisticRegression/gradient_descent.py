@@ -1,4 +1,5 @@
 import numpy as np
+import packages.LogisticRegression as lr
 
 """
 Note 1 - Explanation of how _calc_gradient() works.
@@ -56,11 +57,7 @@ W = (X_transpose)(y_err)
 """
 
 
-# tested
-def _add_x0(X):
-    num_rows = X.shape[0]
-    ones = np.ones(num_rows)  # create a vector of 1's
-    return np.insert(X, 0, ones, axis=1)
+
 
 
 def _calc_log_likelihood(X, y_true, W):
@@ -146,11 +143,8 @@ def gradient_descent(X, y_true, eta, epsilon, W):
     # set initial weights
     weights = W
 
-    # append imaginary column X_0=1 to accommodate w_0
-    X_aug = _add_x0(X)
-
     # calculate original log likelihood
-    prev_log_likelihood = _calc_log_likelihood(X_aug, y_true, weights)
+    prev_log_likelihood = _calc_log_likelihood(X, y_true, weights)
 
     # perform gradient descent
     count = 0
@@ -162,12 +156,12 @@ def gradient_descent(X, y_true, eta, epsilon, W):
             break  # stop descending
 
         # update weights
-        y_pred = _get_y_predictions(X_aug, weights)
-        gradient = _calc_gradient(X_aug, y_true, y_pred)
+        y_pred = _get_y_predictions(X, weights)
+        gradient = _calc_gradient(X, y_true, y_pred)
         weights = _update_weights(weights, eta, gradient)
 
         # calculate difference
-        log_likelihood = _calc_log_likelihood(X_aug, y_true, weights)
+        log_likelihood = _calc_log_likelihood(X, y_true, weights)
         diff = prev_log_likelihood - log_likelihood
 
         # save log likelihood for next round

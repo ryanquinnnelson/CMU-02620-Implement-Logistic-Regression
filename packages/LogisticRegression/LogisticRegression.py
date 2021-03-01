@@ -2,9 +2,25 @@ import numpy as np
 import packages.LogisticRegression.gradient_descent as gd
 
 
-# ?? strategy to set weights
 def _set_weights(cols):
-    return np.ones(cols)
+    """
+    Creates an array of weights of length equal to cols, with each element set to 0.
+    :param cols:
+    :return:
+    """
+    return np.zeros(cols)
+
+
+def _add_x0(X):
+    """
+    Adds a column to the left of matrix X with each element set to 1.
+    :param X:
+    :param rows:
+    :return:
+    """
+    rows = X.shape[0]
+    ones = np.ones(rows)
+    return np.insert(X, 0, ones, axis=1)
 
 
 class LogisticRegression:
@@ -26,8 +42,12 @@ class LogisticRegression:
         :param y:
         :return:
         """
+        # append imaginary column X_0=1 to accommodate w_0
+        X_aug = _add_x0(X)
+
         # set initial weights
-        weights = _set_weights(X.shape[1] + 1)  # add new column to accommodate w_0
+        cols = X.shape[1]
+        weights = _set_weights(cols)
 
         # perform gradient descent until convergence
         weights = gd.gradient_descent(X, y, self.eta, self.epsilon, weights)

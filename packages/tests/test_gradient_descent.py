@@ -33,25 +33,13 @@ def test__calc_log_likelihood():
     np.testing.assert_allclose(actual, expected)  # rounding makes exact match impossible
 
 
-def test__get_y_prediction():
-    x = np.array([1, 1, 2])
-    w = np.array([4, 5, 6])
-    expected = np.exp(21) / (1 + np.exp(21))
-    actual = gd._get_y_prediction(x, w)
-    assert actual == expected
-
-
 def test__get_y_predictions():
-    X = np.array([[.1, .5, .1, .1],
-                  [.1, .1, .1, .1],
-                  [.1, .1, .2, .3]])
+    X = np.array([[.1, .5, .2, .1],
+                  [.1, .1, .2, .1],
+                  [.1, .1, .2, .5]])
     w = np.array([2, 4, 5, 6])
 
-    a = gd._get_y_prediction(X[0], w)  # row 1
-    b = gd._get_y_prediction(X[1], w)  # row 2
-    c = gd._get_y_prediction(X[2], w)  # row 3
-
-    expected = np.array([a, b, c])
+    expected = np.exp(np.matmul(X, w)) / (np.ones(3) + np.exp(np.matmul(X, w)))
     actual = gd._get_y_predictions(X, w)
     np.testing.assert_array_equal(actual, expected)
 
@@ -75,3 +63,11 @@ def test__update_weights():
     expected = np.array([4.01, 4.98, 6.03])
     actual = gd._update_weights(w, eta, gradient)
     np.testing.assert_array_equal(actual, expected)
+
+
+# def test__get_y_prediction():
+#     x = np.array([1, 1, 2])
+#     w = np.array([4, 5, 6])
+#     expected = np.exp(21) / (1 + np.exp(21))
+#     actual = gd._get_y_prediction(x, w)
+#     assert actual == expected

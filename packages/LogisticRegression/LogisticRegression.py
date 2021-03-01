@@ -74,12 +74,20 @@ class LogisticRegression:
 
     def predict_proba(self, X):
         """
-        Returns calculated probabilities Y=1 for each sample.
+        Probability estimates. Returned estimates for all classes are ordered by the label of classes.
+        Note: Currently implemented for data with two classes.
+
         :param X: L x n matrix, where L is the number of samples and n is the number of features
-        :return: L x 1 vector
+        :return: L x j vector, where j is the number of classes
         """
         # append imaginary column X_0=1 to accommodate w_0
         X_aug = _add_x0(X)
 
-        y_pred = gd.get_y_predictions(X_aug, self.weights)
-        return y_pred
+        # predictions for Y=1
+        y_pred_1 = gd.get_y_predictions(X_aug, self.weights)
+
+        # predictions for Y=0
+        rows = y_pred_1.shape[0]
+        y_pred_0 = np.ones(rows) - y_pred_1
+
+        return np.column_stack((y_pred_0, y_pred_1))

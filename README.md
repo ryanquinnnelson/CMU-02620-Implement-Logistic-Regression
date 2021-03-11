@@ -9,4 +9,7 @@ This is a place to store algorithm implementations for the Spring 2021 Machine L
     - Ridge Regression (mean-centered)
 - Classification
   - Logistic Regression
+  
+### Implementation List - Unsupervised Learning
+- Classification
   - K-means

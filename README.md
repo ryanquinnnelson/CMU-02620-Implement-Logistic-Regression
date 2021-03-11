@@ -1,15 +1,3 @@
-# CMU-02620-Algorithm-Implementations
+# CMU-02620-logistic-regression
 
-This is a place to store algorithm implementations for the Spring 2021 Machine Learning for Scientists course.
-
-### Implementation List - Supervised Learning
-
-- Regression
-    - Univariate Regression (mean-centered)
-    - Ridge Regression (mean-centered)
-- Classification
-  - Logistic Regression
-  
-### Implementation List - Unsupervised Learning
-- Classification
-  - K-means
+This project implements (2-class) logistic regression as a Python package with documentation and unit tests.

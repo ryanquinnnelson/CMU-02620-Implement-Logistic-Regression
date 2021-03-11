@@ -1,4 +1,4 @@
-# CMU-02620-LogisticRegression
+# CMU-02620-logistic-regression
 
 Spring 2021 - Machine Learning for Scientists
 
